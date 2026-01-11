@@ -748,7 +748,11 @@ Cost PedestrianCost::EdgeCost(const baldr::DirectedEdge* edge,
   // TODO - consider using an array of "use factors" to avoid this conditional
   float factor = 1.0f + kSacScaleCostFactor[static_cast<uint8_t>(edge->sac_scale())] +
                  grade_penalty[edge->weighted_grade()];
-  if (edge->use() == Use::kFootway || edge->use() == Use::kSidewalk) {
+                 
+  // This fixes issue where routes jump to roads at intersections instead of using crossings
+  // See: https://github.com/valhalla/valhalla/issues/4657
+  if (edge->use() == Use::kFootway || edge->use() == Use::kSidewalk ||
+      edge->use() == Use::kPedestrianCrossing) {
     factor *= walkway_factor_;
   } else if (edge->use() == Use::kAlley) {
     factor *= alley_factor_;
